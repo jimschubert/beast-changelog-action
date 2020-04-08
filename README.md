@@ -13,6 +13,26 @@ Maybe not entirely true. This action aims to do a few things:
 
 _Beast Changelog Action_ is built on top of [jimschubert/changelog](https://github.com/jimschubert/changelog), which could be wrapped similarly to this action if you need to target another CI tool.
 
+---
+
+The changelog format following this repository's [full example](.github/workflows/example.yml) will resemble:
+
+```markdown
+## v1
+
+### Features
+
+* [426dbf4915](https://github.com/jimschubert/beast-changelog-action/commit/426dbf49151c269024a7c3ca4af83a49909a5b7b) Update action.yml to use image on dockerhub ([jimschubert](https://github.com/jimschubert))
+
+### Other
+
+* [0fc811905d](https://github.com/jimschubert/beast-changelog-action/commit/0fc811905d02aa316cf0ad8226bb8fc57bc181fb) doc: Create README for action ([jimschubert](https://github.com/jimschubert))
+
+<em>For more details, see <a href="https://github.com/jimschubert/beast-changelog-action/compare/v0.1...v1">v0.1..v1</a></em>
+```
+
+---
+
 ## Inputs
 
 ### `GITHUB_TOKEN`
