@@ -1,0 +1,33 @@
+{
+  "resolve": "prs",
+  "groupings": [
+  {
+    "name": "feature",
+    "patterns": [
+      "\\bfeat\\b",
+      "\\bfeature\\b",
+      "\\badd\\b"
+    ]
+  },
+  {
+    "name": "bug",
+    "patterns": [
+      "\\bbug\\b",
+      "\\bfix\\b"
+    ]
+  },
+  {
+    "name": "other",
+    "patterns": [
+      ".?"
+    ]
+  }
+  ],
+  "exclude": [
+    "wip",
+    "help wanted",
+    "\\bdoc\\b"
+  ],
+  "sort": "desc",
+  "local": true
+}

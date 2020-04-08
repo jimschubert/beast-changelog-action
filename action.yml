@@ -1,0 +1,79 @@
+# Copyright 2020 Jim Schubert
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Beast Changelog
+author: Jim Schubert
+description: Generate a social-first markdown changelog using GitHub APIs
+inputs:
+  GITHUB_TOKEN:
+    description: >
+      GitHub token used to access the repository defined in the GITHUB_REPOSITORY input.
+
+      It is recommended to [create a new personal access token](https://github.com/settings/tokens/new) with the least permissions (e.g. public_repo).
+      Using a service account for the GitHub Token is also highly recommended.
+
+      [Learn more about using secrets](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets)
+    required: true
+    default: ${{github.token}}
+  GITHUB_REPOSITORY:
+    description: 'The target github repo in the format owner/repo'
+    required: true
+    default: ${{github.repository}}
+  CONFIG_LOCATION:
+    description: >
+      The file location to the changelog configuration.
+
+      See [jimschubert/changelog](https://github.com/jimschubert/changelog) for schema and further details.
+    required: true
+    default: .github/changelog.json
+  OUTPUT:
+    description: >
+      The output file where the changelog will be written.
+
+      The file is created and appended, but _not_ committed back to the repository.
+
+      It is recommended to add a post-processing step in your workflow to prepend to an existing changelog.
+    required: true
+    default: .github/CHANGELOG.md
+  FROM:
+    description: >
+      The beginning tag from which to generate the changelog.
+
+      This can be queried on an unshallow-ed repository with:
+
+      ```
+      git describe --tags --abbrev=0 --match 'v*' HEAD~
+      ```
+
+      See also [jimschubert/query-tag-action](https://github.com/jimschubert/query-tag-action).
+    required: true
+  TO:
+    description: >
+      The ending tag until which the changelog should be generated.
+
+      This can be queried on an unshallow-ed repository with:
+
+      ```
+      git describe --tags --abbrev=0 --match 'v*' HEAD
+      ```
+
+      See also [jimschubert/query-tag-action](https://github.com/jimschubert/query-tag-action).
+    required: true
+branding:
+  icon: 'sunrise'
+  color: 'yellow'
+runs:
+  using: docker
+  # image: docker://jimschubert/beast-changelog-action:latest
+  image: Dockerfile
