@@ -75,5 +75,6 @@ branding:
   color: 'yellow'
 runs:
   using: docker
-  # image: docker://jimschubert/beast-changelog-action:latest
-  image: Dockerfile
+  image: docker://jimschubert/beast-changelog-action:latest
+  # image: Dockerfile
+
