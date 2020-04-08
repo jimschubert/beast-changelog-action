@@ -1,0 +1,2 @@
+# Beast Changelog Action
+
