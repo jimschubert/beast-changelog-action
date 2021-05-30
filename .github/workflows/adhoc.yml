@@ -65,13 +65,12 @@ jobs:
           skip-unshallow: 'true'
       - name: Create Changelog
         id: changelog
-        uses: ./
+        uses: jimschubert/beast-changelog-action@v1
         env:
           LOG_LEVEL: debug
         with:
           GITHUB_TOKEN: ${{secrets.GH_PAT}}
           GITHUB_REPOSITORY: ${{ github.event.inputs.repo }}
-          CONFIG_LOCATION: .github/changelog-local.yml
           FROM: ${{steps.last.outputs.tag}}
           TO: ${{steps.current.outputs.tag}}
           OUTPUT: .github/CHANGELOG.md
