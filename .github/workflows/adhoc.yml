@@ -35,19 +35,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Echo inputs and modify env
+      - name: Echo inputs
         run: |
           echo "org/repo: '${{ github.event.inputs.repo }}'"
           echo "from: '${{ github.event.inputs.from }}'"
           echo "to: '${{ github.event.inputs.to }}'"
-      - name: Checkout
+      - name: Checkout adhoc repo
         uses: actions/checkout@v2
         with:
           repository: ${{ github.event.inputs.repo }}
           token: ${{secrets.GH_PAT}}
-      - name: Unshallow
+      - name: Unshallow adhoc repo
         run: git fetch --prune --unshallow
-      - name: Find Last Tag
+      - name: Find Previous Tag
         id: last
         uses: jimschubert/query-tag-action@v1
         with:
@@ -63,14 +63,20 @@ jobs:
           exclude: '*-rc*'
           commit-ish: '${{ github.event.inputs.to }}'
           skip-unshallow: 'true'
+      - name: Checkout beast-changelog-action
+        uses: actions/checkout@v2
+        with:
+          path: beast-changelog-action
       - name: Create Changelog
         id: changelog
+        # uses: ./beast-changelog-action
         uses: jimschubert/beast-changelog-action@v1
         env:
           LOG_LEVEL: debug
         with:
           GITHUB_TOKEN: ${{secrets.GH_PAT}}
           GITHUB_REPOSITORY: ${{ github.event.inputs.repo }}
+          CONFIG_LOCATION: beast-changelog-action/.github/changelog-local.yml
           FROM: ${{steps.last.outputs.tag}}
           TO: ${{steps.current.outputs.tag}}
           OUTPUT: .github/CHANGELOG.md
