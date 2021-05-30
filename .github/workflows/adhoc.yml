@@ -33,8 +33,6 @@ jobs:
 
   changelogger:
     runs-on: ubuntu-latest
-    env:
-      GITHUB_REPOSITORY: ${{ github.event.inputs.repo }}
 
     steps:
       - name: Echo inputs and modify env
@@ -68,9 +66,11 @@ jobs:
       - name: Create Changelog
         id: changelog
         uses: ./
+        env:
+          LOG_LEVEL: debug
         with:
           GITHUB_TOKEN: ${{secrets.GH_PAT}}
-          # GITHUB_REPOSITORY: ${{github.repository}}
+          GITHUB_REPOSITORY: ${{ github.event.inputs.repo }}
           CONFIG_LOCATION: .github/changelog-local.yml
           FROM: ${{steps.last.outputs.tag}}
           TO: ${{steps.current.outputs.tag}}
