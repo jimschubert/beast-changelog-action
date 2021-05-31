@@ -46,8 +46,8 @@ github.com/google/go-querystring v1.0.0/go.mod h1:odCYkC5MyYFN7vkCjXpyrEuKhc/BUO
 github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 h1:BQSFePA1RWJOlocH6Fxy8MmwDt+yVQYULKfN0RoTN8A=
 github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99/go.mod h1:1lJo3i6rXxKeerYnT8Nvf0QmHCRC1n8sfWVwXF2Frvo=
 github.com/jessevdk/go-flags v1.4.0/go.mod h1:4FA24M0QyGHXBuZZK/XkWh8h0e1EYbRYJSGM75WSRxI=
-github.com/jimschubert/changelog v1.1.0 h1:3OPkhZHvdcr/dA15ddQheqSDG8AUULS73U43bc/5i/I=
-github.com/jimschubert/changelog v1.1.0/go.mod h1:uI6HfCIUsXhnW+Rj1YTTGfh7Sf6nYsWZXdI0o/HtLHo=
+github.com/jimschubert/changelog v1.2.1 h1:GrHmQVDL3rMJz7a8wNbHH4vY4an15kno4GdBWjI+6CU=
+github.com/jimschubert/changelog v1.2.1/go.mod h1:uI6HfCIUsXhnW+Rj1YTTGfh7Sf6nYsWZXdI0o/HtLHo=
 github.com/kevinburke/ssh_config v0.0.0-20190725054713-01f96b0aa0cd h1:Coekwdh0v2wtGp9Gmz1Ze3eVRAWJMLokvN3QjdzCHLY=
 github.com/kevinburke/ssh_config v0.0.0-20190725054713-01f96b0aa0cd/go.mod h1:CT57kijsi8u/K/BOFA39wgDQJ9CxiF4nAY/ojJ6r6mM=
 github.com/konsorten/go-windows-terminal-sequences v1.0.1/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=

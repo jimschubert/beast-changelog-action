@@ -23,12 +23,15 @@ on:
       from:
         description: 'The starting branch/tag/commit'
         required: true
-        default: 'v1.0'
+        default: 'v1.1.0'
       to:
         description: 'The ending branch/tag/commit'
         required: false
-        default: 'HEAD'
-
+        default: 'v1.2.1'
+      local:
+        description: 'Evaluate commits from local (otherwise via GitHub API)'
+        required: false
+        default: 'false'
 jobs:
 
   changelogger:
@@ -40,6 +43,11 @@ jobs:
           echo "org/repo: '${{ github.event.inputs.repo }}'"
           echo "from: '${{ github.event.inputs.from }}'"
           echo "to: '${{ github.event.inputs.to }}'"
+          if [ "true" == "${{ github.event.inputs.local }}" ]; then
+            echo "CONFIG_FILE=beast-changelog-action/.github/changelog-local.yml" >> $GITHUB_ENV
+          else
+            echo "CONFIG_FILE=beast-changelog-action/.github/changelog.yml" >> $GITHUB_ENV
+          fi
       - name: Checkout adhoc repo
         uses: actions/checkout@v2
         with:
@@ -69,14 +77,14 @@ jobs:
           path: beast-changelog-action
       - name: Create Changelog
         id: changelog
-        # uses: ./beast-changelog-action
-        uses: jimschubert/beast-changelog-action@v1
+        uses: ./beast-changelog-action
+        # uses: jimschubert/beast-changelog-action@v1
         env:
           LOG_LEVEL: debug
         with:
           GITHUB_TOKEN: ${{secrets.GH_PAT}}
           GITHUB_REPOSITORY: ${{ github.event.inputs.repo }}
-          CONFIG_LOCATION: beast-changelog-action/.github/changelog-local.yml
+          CONFIG_LOCATION: ${{ env.CONFIG_FILE }}
           FROM: ${{steps.last.outputs.tag}}
           TO: ${{steps.current.outputs.tag}}
           OUTPUT: .github/CHANGELOG.md
