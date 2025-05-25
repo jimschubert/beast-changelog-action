@@ -49,7 +49,7 @@ jobs:
             echo "CONFIG_FILE=beast-changelog-action/.github/changelog.yml" >> $GITHUB_ENV
           fi
       - name: Checkout adhoc repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: ${{ github.event.inputs.repo }}
           token: ${{secrets.GH_PAT}}
@@ -57,7 +57,7 @@ jobs:
         run: git fetch --prune --unshallow
       - name: Find Previous Tag
         id: last
-        uses: jimschubert/query-tag-action@v1
+        uses: jimschubert/query-tag-action@v2
         with:
           include: '*'
           exclude: '*-rc*'
@@ -65,14 +65,14 @@ jobs:
           skip-unshallow: 'true'
       - name: Find Current Tag
         id: current
-        uses: jimschubert/query-tag-action@v1
+        uses: jimschubert/query-tag-action@v2
         with:
           include: '*'
           exclude: '*-rc*'
           commit-ish: '${{ github.event.inputs.to }}'
           skip-unshallow: 'true'
       - name: Checkout beast-changelog-action
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           path: beast-changelog-action
       - name: Create Changelog
