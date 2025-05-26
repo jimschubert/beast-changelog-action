@@ -32,6 +32,11 @@ on:
         description: 'Evaluate commits from local (otherwise via GitHub API)'
         required: false
         default: 'false'
+
+      actions_branch:
+        description: 'The branch of the beast-changelog-action to use'
+        required: false
+        default: ''
 jobs:
 
   changelogger:
@@ -75,6 +80,13 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: beast-changelog-action
+      - name: Checkout beast-changelog-action branch
+        if: ${{ github.event.inputs.actions_branch != '' }}
+        run: |
+          set -e
+          cd beast-changelog-action
+          git fetch origin ${{ github.event.inputs.actions_branch }}
+          git checkout ${{ github.event.inputs.actions_branch }}
       - name: Create Changelog
         id: changelog
         uses: ./beast-changelog-action
