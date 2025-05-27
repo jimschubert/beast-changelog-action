@@ -1,0 +1,48 @@
+# Copied from https://github.com/actions/checkout/blob/85e6279cec87321a52edac9c87bce653a07cf6c2/.github/workflows/update-main-version.yml#L1
+# actions/checkout is MIT licensed. See https://github.com/actions/checkout/blob/main/LICENSE
+name: Publish Action Major Tag
+run-name: Publish ${{ github.event.inputs.major_version }} from ${{ github.event.inputs.target }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: The tag or reference to use
+        required: true
+      major_version:
+        type: choice
+        description: The major version to update
+        options:
+          - v3
+          - v2
+          - v1
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      # Note this update workflow can also be used as a rollback tool.
+      # For that reason, it's best to pin `actions/checkout` to a known, stable version
+      # (typically, about two releases back).
+      - uses: actions/checkout@v4.1.6
+        with:
+          fetch-depth: 0
+      - name: Check major_version matches action.yml image
+        run: |
+          set -e
+          # Get the major_version (e.g., from env or input)
+          MAJOR_VERSION="${{ github.event.inputs.major_version }}"
+          # Extract the version from line 31 of action.yml
+          IMAGE_VERSION=$(sed -nE 's/^ *image: docker:\/\/jimschubert\/beast-changelog-action:(v[0-9]+).*/\1/p' action.yml)
+          if [ "$MAJOR_VERSION" != "$IMAGE_VERSION" ]; then
+            echo "Error: major_version ($MAJOR_VERSION) does not match image version ($IMAGE_VERSION) in action.yml"
+            exit 1
+          fi
+      - name: Git config
+        run: |
+          git config user.name "Jim Schubert"
+          git config user.email "james.schubert@gmail.com"
+      - name: Tag new target
+        run: git tag -f ${{ github.event.inputs.major_version }} ${{ github.event.inputs.target }}
+      - name: Push new tag
+        run: git push origin ${{ github.event.inputs.major_version }} --force
