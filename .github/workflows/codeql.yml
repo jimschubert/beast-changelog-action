@@ -21,6 +21,11 @@ on:
     branches: [ "main", "master"]
   schedule:
     - cron: '37 9 * * 4'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   # Minimal usage (analyzes 'actions' and 'go' by default):
   codeql:
