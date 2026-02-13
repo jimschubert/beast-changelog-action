@@ -15,6 +15,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -25,19 +26,29 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+var (
+	version = "dev"
+	commit  = "none"
+)
+
 func main() {
+	log.Infof("beast-changelog-action %s (%s)", version, commit)
+	log.Infof("https://github.com/jimschubert/beast-changelog-action")
+	fmt.Println()
+
 	githubToken := act.GetInput("GITHUB_TOKEN")
 	if githubToken == "" {
 		var ok bool
 		// allow for local testing
 		githubToken, ok = os.LookupEnv("GITHUB_TOKEN")
 		if !ok {
-			log.Fatal("Missing input 'GITHUB_TOKEN' in labeler action configuration.")
+			log.Fatal("Missing input 'GITHUB_TOKEN' in action configuration.")
 		}
 	}
 
 	fullRepo := act.GetInput("GITHUB_REPOSITORY")
-	if !strings.Contains(fullRepo, "/") {
+	owner, repo, found := strings.Cut(fullRepo, "/")
+	if !found {
 		log.WithFields(log.Fields{"GITHUB_REPOSITORY": fullRepo}).Fatal("Invalid GITHUB_REPOSITORY. Must be in the format: owner/repo")
 	}
 
@@ -70,10 +81,6 @@ func main() {
 			log.Panic(err)
 		}
 	}()
-
-	repoParts := strings.Split(fullRepo, "/")
-	owner := repoParts[0]
-	repo := repoParts[1]
 
 	config := model.LoadOrNewConfig(&configLocation, owner, repo)
 	changes := changelog.Changelog{

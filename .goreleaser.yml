@@ -1,0 +1,81 @@
+# Check the documentation at http://goreleaser.com
+version: 2
+before:
+  hooks:
+    # You may remove this if you don't use go modules.
+    - go mod download
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - darwin
+      - linux
+      - windows
+    goarch:
+      - amd64
+      - '386'
+      - arm
+      - arm64
+    ignore:
+      - goos: darwin
+        goarch: '386'
+      - goos: darwin
+        goarch: arm
+      - goos: windows
+        goarch: '386'
+      - goos: windows
+        goarch: arm
+    # Path to main.go file or main package.
+    # Default is `.`.
+    main: ./main.go
+archives:
+  - name_template: >-
+      {{ .ProjectName }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+    formats: [ tar.gz ]
+    format_overrides:
+      - goos: windows
+        formats: [ zip ]
+    files:
+      - LICENSE
+      - README.md
+sboms:
+  - id: archive
+    artifacts: archive
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  version_template: "{{ incpatch .Version }}-next"
+changelog:
+  sort: desc
+  filters:
+    exclude:
+      - '^doc[s]?:'
+      - '^\[doc[s]?\]'
+      - '^wip:'
+      - '^WIP:'
+docker_digest:
+  name_template: "digests.txt"
+dockers_v2:
+  - images:
+      - "jimschubert/beast-changelog-action"
+    tags:
+      - "latest"
+      - "{{ .Tag }}"
+      - "v{{ .Major }}"
+    dockerfile: release.Dockerfile
+    annotations:
+      "org.opencontainers.image.description": "GitHub Action to generate changelogs with extensible templating."
+      "org.opencontainers.image.url": "https://github.com/jimschubert/{{.ProjectName}}"
+    labels:
+      "org.opencontainers.image.created": "{{ .Date }}"
+      "org.opencontainers.image.name": "{{ .ProjectName }}"
+      "org.opencontainers.image.revision": "{{ .FullCommit }}"
+      "org.opencontainers.image.version": "{{ .Version }}"
+      "org.opencontainers.image.source": "https://github.com/jimschubert/beast-changelog-action"
+      "org.opencontainers.image.licenses": "Apache-2.0"
+    build_args:
+      APP_NAME: "{{ .ProjectName }}"

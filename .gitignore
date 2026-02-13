@@ -1,4 +1,5 @@
 beast-changelog-action
+dist/
 
 # Binaries for programs and plugins
 *.exe
