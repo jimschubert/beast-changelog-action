@@ -15,6 +15,9 @@
 name: Example
 on: [push]
 
+permissions:
+  contents: read
+
 jobs:
 
   changelogger:
