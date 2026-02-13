@@ -59,7 +59,7 @@ jobs:
             echo "CONFIG_FILE=beast-changelog-action/.github/changelog.yml" >> $GITHUB_ENV
           fi
       - name: Checkout adhoc repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: ${{ github.event.inputs.repo }}
           token: ${{secrets.GH_PAT}}
@@ -82,7 +82,7 @@ jobs:
           commit-ish: '${{ github.event.inputs.to }}'
           skip-unshallow: 'true'
       - name: Checkout beast-changelog-action
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: beast-changelog-action
       - name: Checkout beast-changelog-action branch
