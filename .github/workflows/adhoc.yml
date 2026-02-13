@@ -37,6 +37,10 @@ on:
         description: 'The branch of the beast-changelog-action to use'
         required: false
         default: ''
+      use_published_action:
+        description: 'Use published action version (e.g., v1) instead of local checkout'
+        required: false
+        default: ''
 jobs:
 
   changelogger:
@@ -81,16 +85,28 @@ jobs:
         with:
           path: beast-changelog-action
       - name: Checkout beast-changelog-action branch
-        if: ${{ github.event.inputs.actions_branch != '' }}
+        if: ${{ github.event.inputs.actions_branch != '' && github.event.inputs.use_published_action == '' }}
         run: |
           set -e
           cd beast-changelog-action
           git fetch origin ${{ github.event.inputs.actions_branch }}
           git checkout ${{ github.event.inputs.actions_branch }}
-      - name: Create Changelog
-        id: changelog
-        uses: ./beast-changelog-action
-        # uses: jimschubert/beast-changelog-action@v1
+      - name: Setup Go
+        if: ${{ github.event.inputs.use_published_action == '' }}
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          check-latest: 'true'
+          cache-dependency-path: beast-changelog-action/go.sum
+      - name: Build local action
+        if: ${{ github.event.inputs.use_published_action == '' }}
+        run: |
+          cd beast-changelog-action
+          go build -o ../beast-changelog-action-bin .
+      - name: Create Changelog (Published)
+        if: ${{ github.event.inputs.use_published_action != '' }}
+        id: changelog-published
+        uses: jimschubert/beast-changelog-action@${{ github.event.inputs.use_published_action }}
         env:
           LOG_LEVEL: debug
         with:
@@ -100,6 +116,19 @@ jobs:
           FROM: ${{steps.last.outputs.tag}}
           TO: ${{steps.current.outputs.tag}}
           OUTPUT: .github/CHANGELOG.md
+      - name: Create Changelog (Local)
+        if: ${{ github.event.inputs.use_published_action == '' }}
+        id: changelog-local
+        env:
+          LOG_LEVEL: debug
+          GITHUB_TOKEN: ${{secrets.GH_PAT}}
+          INPUT_GITHUB_TOKEN: ${{secrets.GH_PAT}}
+          INPUT_GITHUB_REPOSITORY: ${{ github.event.inputs.repo }}
+          INPUT_CONFIG_LOCATION: ${{ env.CONFIG_FILE }}
+          INPUT_FROM: ${{steps.last.outputs.tag}}
+          INPUT_TO: ${{steps.current.outputs.tag}}
+          INPUT_OUTPUT: .github/CHANGELOG.md
+        run: ./beast-changelog-action-bin
       - name: View Changelog
         run: cat .github/CHANGELOG.md
 
