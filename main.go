@@ -32,6 +32,19 @@ var (
 )
 
 func main() {
+	level, ok := os.LookupEnv("LOG_LEVEL")
+	if !ok {
+		level = "info"
+		_ = os.Setenv("LOG_LEVEL", level)
+	}
+
+	logLevel, _ := log.ParseLevel(level)
+	log.SetFormatter(&customFormatter{
+		EnableTimestamp: logLevel == log.TraceLevel,
+	})
+
+	log.SetLevel(logLevel)
+
 	log.Infof("beast-changelog-action %s (%s)", version, commit)
 	log.Infof("https://github.com/jimschubert/beast-changelog-action")
 	fmt.Println()
@@ -42,38 +55,42 @@ func main() {
 		// allow for local testing
 		githubToken, ok = os.LookupEnv("GITHUB_TOKEN")
 		if !ok {
-			log.Fatal("Missing input 'GITHUB_TOKEN' in action configuration.")
+			log.Fatal("Missing input 'GITHUB_TOKEN' in action configuration")
 		}
 	}
 
 	fullRepo := act.GetInput("GITHUB_REPOSITORY")
 	owner, repo, found := strings.Cut(fullRepo, "/")
 	if !found {
-		log.WithFields(log.Fields{"GITHUB_REPOSITORY": fullRepo}).Fatal("Invalid GITHUB_REPOSITORY. Must be in the format: owner/repo")
+		log.WithFields(log.Fields{"GITHUB_REPOSITORY": fullRepo}).Fatal("Invalid GITHUB_REPOSITORY format. Expected: owner/repo")
 	}
+	log.Infof("Target repository: %s", fullRepo)
 
 	configLocation := act.GetInput("CONFIG_LOCATION")
 	if _, err := os.Stat(configLocation); os.IsNotExist(err) {
 		log.WithFields(log.Fields{
 			"config_location": configLocation,
-		}).Fatal("The CONFIG_LOCATION does not seem to exist. Did you checkout via actions/checkout first?")
+		}).Fatal("Config file not found. Did you checkout via actions/checkout first?")
 	}
+	log.Infof("Using config: %s", configLocation)
 
 	from := act.GetInput("FROM")
 	to := act.GetInput("TO")
 	output := act.GetInput("OUTPUT")
 
-	_ = os.Setenv("GITHUB_TOKEN", githubToken)
-	_ = os.Setenv("LOG_LEVEL", "info")
+	log.Infof("Generating changelog: %s → %s", from, to)
+	log.Infof("Output file: %s", output)
 
-	err := os.MkdirAll(filepath.Dir(output), os.ModeDir)
+	_ = os.Setenv("GITHUB_TOKEN", githubToken)
+
+	err := os.MkdirAll(filepath.Dir(output), 0755)
 	if err != nil {
-		log.WithFields(log.Fields{"output": output}).Fatal("Unable to create directory for changelog output")
+		log.WithFields(log.Fields{"output": output}).Fatal("Unable to create output directory")
 	}
 
 	outputFile, err := os.OpenFile(output, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
-		log.WithFields(log.Fields{"output": output}).Fatal("Unable to open changelog output for write")
+		log.WithFields(log.Fields{"output": output}).Fatal("Unable to open output file for writing")
 	}
 
 	defer func() {
@@ -82,6 +99,7 @@ func main() {
 		}
 	}()
 
+	log.Info("Loading configuration and generating changelog...")
 	config := model.LoadOrNewConfig(&configLocation, owner, repo)
 	changes := changelog.Changelog{
 		Config: config,
@@ -93,4 +111,6 @@ func main() {
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Fatal("Failed to generate changelog")
 	}
+
+	log.Info("✅ Changelog generated successfully!")
 }
