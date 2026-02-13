@@ -40,7 +40,7 @@ func main() {
 
 	logLevel, _ := log.ParseLevel(level)
 	log.SetFormatter(&customFormatter{
-		EnableTimestamp: logLevel == log.DebugLevel,
+		EnableTimestamp: logLevel == log.TraceLevel,
 	})
 
 	log.SetLevel(logLevel)
