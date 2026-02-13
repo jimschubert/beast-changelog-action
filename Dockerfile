@@ -7,6 +7,6 @@ ADD . /go/src/app
 
 RUN go mod download && go build -o /go/bin/app
 
-FROM gcr.io/distroless/base-debian12
+FROM gcr.io/distroless/base-debian12:nonroot
 COPY --from=builder /go/bin/app /
 ENTRYPOINT ["/app"]
