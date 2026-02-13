@@ -94,7 +94,7 @@ jobs:
           git checkout ${{ github.event.inputs.actions_branch }}
       - name: Setup Go
         if: github.event.inputs.use_published_action == 'false'
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version-file: go.mod
           check-latest: 'true'
