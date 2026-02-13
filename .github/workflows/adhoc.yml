@@ -38,9 +38,10 @@ on:
         required: false
         default: ''
       use_published_action:
-        description: 'Use published action version (e.g., v1) instead of local checkout'
+        description: 'Use published action version (v1) instead of local checkout'
         required: false
-        default: ''
+        type: boolean
+        default: false
 jobs:
 
   changelogger:
@@ -85,28 +86,28 @@ jobs:
         with:
           path: beast-changelog-action
       - name: Checkout beast-changelog-action branch
-        if: ${{ github.event.inputs.actions_branch != '' && github.event.inputs.use_published_action == '' }}
+        if: github.event.inputs.actions_branch != '' && github.event.inputs.use_published_action == 'false'
         run: |
           set -e
           cd beast-changelog-action
           git fetch origin ${{ github.event.inputs.actions_branch }}
           git checkout ${{ github.event.inputs.actions_branch }}
       - name: Setup Go
-        if: ${{ github.event.inputs.use_published_action == '' }}
+        if: github.event.inputs.use_published_action == 'false'
         uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
           check-latest: 'true'
           cache-dependency-path: beast-changelog-action/go.sum
       - name: Build local action
-        if: ${{ github.event.inputs.use_published_action == '' }}
+        if: github.event.inputs.use_published_action == 'false'
         run: |
           cd beast-changelog-action
           go build -o ../beast-changelog-action-bin .
       - name: Create Changelog (Published)
-        if: ${{ github.event.inputs.use_published_action != '' }}
+        if: github.event.inputs.use_published_action == 'true'
         id: changelog-published
-        uses: jimschubert/beast-changelog-action@${{ github.event.inputs.use_published_action }}
+        uses: jimschubert/beast-changelog-action@v1
         env:
           LOG_LEVEL: debug
         with:
@@ -117,7 +118,7 @@ jobs:
           TO: ${{steps.current.outputs.tag}}
           OUTPUT: .github/CHANGELOG.md
       - name: Create Changelog (Local)
-        if: ${{ github.event.inputs.use_published_action == '' }}
+        if: github.event.inputs.use_published_action == 'false'
         id: changelog-local
         env:
           LOG_LEVEL: debug
