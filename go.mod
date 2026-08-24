@@ -19,7 +19,7 @@ go 1.25.0
 require (
 	github.com/jimschubert/changelog v1.4.4
 	github.com/sethvargo/go-githubactions v1.3.2
-	github.com/sirupsen/logrus v1.9.4
+	github.com/sirupsen/logrus v1.10.1
 )
 
 require (
